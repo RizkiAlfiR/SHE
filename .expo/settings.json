@@ -1,0 +1,7 @@
+{
+  "urlRandomness": "gt-rip",
+  "hostType": "tunnel",
+  "lanType": "ip",
+  "dev": true,
+  "minify": false
+}
