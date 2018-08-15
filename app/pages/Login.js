@@ -1,44 +1,97 @@
 import React from 'react';
-import { 
+import {
+  ActivityIndicator,
   AppRegistry,
-  StyleSheet, 
-  Text, 
+  StyleSheet,
+  Text,
   View,
   ImageBackground,
   Image,
   TextInput,
   TouchableOpacity,
-  Button,
-  AsyncStorage,
   ScrollView,
-  KeyboardAvoidingView
+  Alert,
+  KeyboardAvoidingView,
+  AsyncStorage
 } from 'react-native';
+import { Button, Icon } from 'native-base';
 
 export default class Login extends React.Component {
+  state = { username: "INDRA.NOFIANDI", password: "semenindonesia", isLoggedIn: false, isLoading: true }
+  static navigationOptions = {
+    header: null
+  }
+  
+  checkLogin() {
+    var url = 'http://10.15.5.150/dev/she/api/Auth/login';
+    var formData = new FormData();
+    formData.append("username", this.state.username)
+    formData.append("password", this.state.password)
+
+    fetch(url, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      method: 'POST',
+      body: formData
+    }).then((response) => response.json())
+      .then((response) => {
+        if (response.response_code == 200) {
+          AsyncStorage.setItem('token', response.token).then(() => {
+            this.setState({ isLoggedIn: true });
+            this.props.navigation.navigate('Main')
+          })
+        } else {
+          Alert.alert('Error', 'Username or Password Wrong', [{
+            text: 'Okay'
+          }])
+        }
+      })
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-          <ImageBackground source={require('../images/warehouse.jpg')} style={styles.backgroundImage}>
+        <ImageBackground source={require('../images/warehouse.jpg')} style={styles.backgroundImage}>
+          <ScrollView>
             <View style={styles.content}>
               <View style={styles.inputContainer}>
-                <Image source={require('../images/logosemen.png')} style={styles.headerImage}></Image>
+                <Image source={require('../images/Logo_SI.png')} style={styles.headerImage}></Image>
 
                 <Text style={styles.logo}>Safety Hygiene Environment System</Text>
                 <Text style={styles.logoChild}>Login in. to see it in action.</Text>
-                
-                <TextInput underlineColorAndroid='transparent' style={styles.input} placeholder= 'Username'></TextInput>
-                <TextInput secureTextEntry={true} underlineColorAndroid='transparent' style={styles.input} placeholder= 'Password'></TextInput>
+
+                <TextInput value={this.state.username} underlineColorAndroid='transparent' style={styles.input} placeholder='Username'
+                  onChangeText={(text) => this.setState({ username: text })}></TextInput>
+                <TextInput value={this.state.password} secureTextEntry={true} underlineColorAndroid='transparent' style={styles.input} placeholder='Password'
+                  onChangeText={(text) => this.setState({ password: text })}></TextInput>
+
+                <Button style={{
+                  alignSelf: 'stretch',
+                  marginTop: 20,
+                  marginBottom: 20,
+                  height: 45,
+                  padding: 20,
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  backgroundColor: '#00cc99',
+                  borderColor: '#00cc99',
+                  borderRadius: 4
+                }} onPress={() => this.checkLogin()}>
+                  <Text style={styles.buttonText}>Login</Text>
+                  <Icon name="ios-arrow-forward" />
+                </Button>
+                {/* this.state.isLoading
+                ?
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <ActivityIndicator size="large" color="#330066" animating />
+                </View>
+                : */}
+                <Text style={styles.logoFooter}>Created by PT SISI © 2017</Text>
               </View>
-
-              <TouchableOpacity onPress={this.props.onLoginPress} style={styles.buttonContainer}>
-                <Text style={styles.buttonText}>Login</Text>             
-              </TouchableOpacity>
-
-              <Text style={styles.logoFooter}>Created by PT SISI © 2017</Text>
             </View>
-          </ImageBackground>
-        </KeyboardAvoidingView>
+          </ScrollView>
+        </ImageBackground>
       </View>
     );
   }
@@ -59,39 +112,39 @@ const styles = StyleSheet.create({
 
   headerImage: {
     alignSelf: 'center',
-    width: 180,
+    width: 200,
     height: 160
   },
 
   content: {
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 15,
+    marginBottom: 15
   },
 
   logo: {
     textAlign: 'center',
     color: '#000',
     fontSize: 24,
-    margin: 15,
+    margin: 15
   },
 
   logoChild: {
     textAlign: 'center',
     color: '#000',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
     marginBottom: 20,
   },
 
   logoFooter: {
     textAlign: 'center',
-    color: '#fff',
-    fontSize: 16,
+    color: 'rgba(0,0,0, 0.5)',
+    fontSize: 12,
     marginBottom: 20,
   },
 
   inputContainer: {
     margin: 20,
-    marginBottom: 0,
     padding: 20,
     paddingBottom: 10,
     alignSelf: 'stretch',
@@ -126,6 +179,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#fff',
-    backgroundColor: '#00cc99'
+    backgroundColor: '#00cc99',
+
   }
 });
