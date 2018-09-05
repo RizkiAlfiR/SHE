@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Image, Text, AsyncStorage, FlatList, ActivityIndicator } from 'react-native';
 import { Container, Header, Content, Card, CardItem, Body } from "native-base";
+import GlobalConfig from './GlobalConfig';
 
 export default class Profile extends Component {
     static navigationOptions = {
@@ -67,7 +68,7 @@ export default class Profile extends Component {
         AsyncStorage.setItem('plant', 'response.plant').then(() => {
             AsyncStorage.getItem('token').then((value) => {
                 // alert(JSON.stringify(value));
-                const url = 'http://10.15.5.150/dev/she/api/Auth/user?token=' + value;
+                const url = GlobalConfig.SERVERHOST + 'api/Auth/user?token=' + value;
 
                 fetch(url)
                     .then((response) => response.json())

@@ -7,17 +7,18 @@ import {
   Button,
   Text,
   Icon,
+  Header,
   Item,
   Footer,
   FooterTab,
-  Label
+  Label,
 } from "native-base";
 
 export default ( MainScreenNavigator = TabNavigator (
   {
     ApprovalPersonal: { screen: props => <ApprovalPersonal {...props} /> },
     ApprovalPinjam: { screen: props => <ApprovalPinjam {...props} /> },
-    ApprovalUnit: { screen: props => <ApprovalUnit {...props} /> }
+    ApprovalUnit: { screen: props => <ApprovalUnit {...props} /> },
   },
   {
     tabBarPosition: "bottom",
@@ -29,21 +30,21 @@ export default ( MainScreenNavigator = TabNavigator (
               vertical
               active={props.navigationState.index === 0}
               onPress={() => props.navigation.navigate("ApprovalPersonal")} >
-              <Icon name="ios-paper-plane" />
+              {/* <Icon name="ios-paper-plane" /> */}
               <Text>Permintaan Personal</Text>
             </Button>
             <Button
               vertical
               active={props.navigationState.index === 1}
               onPress={() => props.navigation.navigate("ApprovalPinjam")} >
-              <Icon name="ios-paper-plane" />
+              {/* <Icon name="ios-paper-plane" /> */}
               <Text>Peminjaman</Text>
             </Button>
             <Button
               vertical
               active={props.navigationState.index === 2}
               onPress={() => props.navigation.navigate("ApprovalUnit")} >
-              <Icon name="ios-paper-plane" />
+              {/* <Icon name="ios-paper-plane" /> */}
               <Text>Permintaan Unit Kerja</Text>
             </Button>
           </FooterTab>

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   ActivityIndicator,
   AppRegistry,
@@ -14,16 +14,26 @@ import {
   KeyboardAvoidingView,
   AsyncStorage
 } from 'react-native';
-import { Button, Icon } from 'native-base';
+import { Button, Icon, Toast } from 'native-base';
+import GlobalConfig from './GlobalConfig';
 
 export default class Login extends React.Component {
-  state = { username: "INDRA.NOFIANDI", password: "semenindonesia", isLoggedIn: false, isLoading: true }
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "INDRA.NOFIANDI",
+      password: "semenindonesia",
+      isLoggedIn: false
+    };
+    // state = { username: "ASRI.WAHJUSUKRISNO", password: "semenindonesia", showToast: false }
+  }
+
   static navigationOptions = {
     header: null
   }
   
   checkLogin() {
-    var url = 'http://10.15.5.150/dev/she/api/Auth/login';
+    var url = GlobalConfig.SERVERHOST + 'api/Auth/login';
     var formData = new FormData();
     formData.append("username", this.state.username)
     formData.append("password", this.state.password)
@@ -66,12 +76,11 @@ export default class Login extends React.Component {
                 <TextInput value={this.state.password} secureTextEntry={true} underlineColorAndroid='transparent' style={styles.input} placeholder='Password'
                   onChangeText={(text) => this.setState({ password: text })}></TextInput>
 
-                <Button style={{
+                <Button block style={{
                   alignSelf: 'stretch',
                   marginTop: 20,
                   marginBottom: 20,
                   height: 45,
-                  padding: 20,
                   alignItems: 'center',
                   borderWidth: 1,
                   backgroundColor: '#00cc99',
@@ -118,7 +127,7 @@ const styles = StyleSheet.create({
 
   content: {
     alignItems: 'center',
-    marginTop: 15,
+    marginTop: 50,
     marginBottom: 15
   },
 
@@ -138,7 +147,8 @@ const styles = StyleSheet.create({
 
   logoFooter: {
     textAlign: 'center',
-    color: 'rgba(0,0,0, 0.5)',
+    color: 'rgba(0, 0, 0, 0.5)',
+    fontWeight: 'bold',
     fontSize: 12,
     marginBottom: 20,
   },

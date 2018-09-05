@@ -1,53 +1,34 @@
 import React, { Component } from 'react';
-import { Image, FlatList, AsyncStorage, Alert, ActivityIndicator, Text, StyleSheet, KeyboardAvoidingView, ScrollView, ImageBackground } from 'react-native';
-import { Container, Content, Card, CardItem, Thumbnail, Button, Icon, Left, Body, Right, Fab, View } from 'native-base';
+import { Image, StyleSheet, FlatList, AsyncStorage, KeyboardAvoidingView, ScrollView, ImageBackground, ActivityIndicator } from 'react-native';
+import { Container, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right, Fab, View } from 'native-base';
 import GlobalConfig from '../GlobalConfig';
 
-var that;
 class ListItem extends React.PureComponent {
-  navigateToScreen(route, id_pinjam){
-    // alert(route);
-    AsyncStorage.setItem('id', id_pinjam).then(() => {
-      that.props.navigation.navigate(route);
-    })
-  }
-
   render() {
     return (
       <View>
-        <Card style={{ marginLeft: 10, marginRight: 10 }}>
+        <Card>
           <CardItem>
             <Left>
               <Body>
-                <Text style={styles.cardtext}>Kode Order                        : {this.props.data.KODE_PINJAM}</Text>
-                <Text style={styles.cardtext}>Order By                             : {this.props.data.NOPEG}</Text>
-                <Text style={styles.cardtext}>Employee Name               : {this.props.data.NAMA}</Text>
-                <Text style={styles.cardtext}>Employee Unit / Divition  : {this.props.data.UK_TEXT}</Text>
-                <Text style={styles.cardtext}>Event Description             : {this.props.data.KETERANGAN}</Text>
-                <Text style={styles.cardtext}>Order Date                          : {this.props.data.CREATE_AT}</Text>
+                <Text>Kode Order   : {this.props.data.KODE_ORDER}</Text>
+                <Text>Penanggung Jawab  : {this.props.data.NAME}</Text>
+                <Text>No. Badge         : {this.props.data.NO_BADGE}</Text>
+                <Text note>Unit Kerja        : {this.props.data.UK_TEXT}</Text>
               </Body>
             </Left>
           </CardItem>
           <CardItem>
             <Left>
               <Body>
-                <Text style={{fontSize: 15}}>Event Date   : {this.props.data.EVENT_DATE}</Text>
+                <Text>Tanggal Order     : {this.props.data.CREATE_AT}</Text>
               </Body>
             </Left>
             <Right>
               <Body>
-                <Text style={{fontSize: 15}}>Return Date  : {this.props.data.RETUR_DATE}</Text>
+                <Text>Status Order      : {this.props.data.STATUS}</Text>
               </Body>
             </Right>
-          </CardItem>
-          <CardItem>
-            <Left>
-              <Body>
-                <Button style={{borderRadius: 5, backgroundColor: '#f8ac59', marginTop: 10}}>
-                <Text style={{fontWeight: 'bold', color: '#ffffff', marginLeft: 10, marginRight: 10}} onPress={() => this.navigateToScreen('ActionsPinjam', this.props.data.ID)}>Actions</Text>
-                </Button>
-              </Body>
-            </Left>
           </CardItem>
         </Card>
       </View>
@@ -55,9 +36,9 @@ class ListItem extends React.PureComponent {
   }
 }
 
-export default class ApprovalPinjam extends Component {
+export default class HistoryOrderUnit extends Component {
   static navigationOptions = {
-    title: 'Approval Peminjaman'
+    title: 'History Order Unit',
   };
 
   constructor() {
@@ -65,14 +46,13 @@ export default class ApprovalPinjam extends Component {
     this.state = {
       active: 'true',
       dataSource: [],
-      isloading: true,
+      // isloading: true,
     };
   }
 
-  _renderItem = ({ item, index }) => (
-    <ListItem data={item} index={index} parentFlatList={this}></ListItem>
+  _renderItem = ({ item }) => (
+    <ListItem data={item}></ListItem>
   )
-
   componentDidMount() {
     this.loadData();
   }
@@ -80,7 +60,7 @@ export default class ApprovalPinjam extends Component {
   loadData() {
     AsyncStorage.getItem('token').then((value) => {
       // alert(JSON.stringify(value));
-      const url = GlobalConfig.SERVERHOST + 'api/v1/apd/approve/mob_view';
+      const url = GlobalConfig.SERVERHOST + 'api/v1/apd/order/view';
       var formData = new FormData();
       formData.append("token", value)
 
@@ -95,7 +75,7 @@ export default class ApprovalPinjam extends Component {
         .then((responseJson) => {
           // alert(JSON.stringify(responseJson));
           this.setState({
-            dataSource: responseJson.data.pinjam,
+            dataSource: responseJson.data.unit+'&nbsp'+kerja,
             isloading: false
           });
         })
@@ -106,7 +86,6 @@ export default class ApprovalPinjam extends Component {
   }
 
   render() {
-    that=this;
     return (
       this.state.isloading
         ?
@@ -121,7 +100,7 @@ export default class ApprovalPinjam extends Component {
                 <ScrollView>
                   <View style={styles.content}>
                     <View style={styles.inputContainer}>
-                      <Text style={styles.logo}>Approval Permintaan Peminjaman</Text>
+                      <Text style={styles.logo}>History Order Unit Kerja</Text>
                       <Text style={styles.logoChild}>PT Semen Indonesia</Text>
                       <FlatList
                         data={this.state.dataSource}

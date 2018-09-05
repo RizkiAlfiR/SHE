@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { ImageBackground, Image, FlatList, AsyncStorage, Alert, ActivityIndicator, StyleSheet, ScrollView,
-  KeyboardAvoidingView, Text, View } from 'react-native';
+import {
+  ImageBackground, Image, FlatList, AsyncStorage, Alert, ActivityIndicator, StyleSheet, ScrollView,
+  KeyboardAvoidingView, Text, View
+} from 'react-native';
 import { Container, Content, Icon, Left, Body, Right, Fab, Form, Button, Textarea, Card, CardItem } from 'native-base';
 import Swipeout from 'react-native-swipeout';
+import GlobalConfig from '../GlobalConfig';
 
 var that;
 class ListItem extends React.PureComponent {
@@ -21,24 +24,23 @@ class ListItem extends React.PureComponent {
 
   render() {
     const { navigate } = that.props.navigation;
-   
+
     return (
-        <View>
-          <Card style={{ marginBottom: 15 }}>
-            <CardItem>
-              <Left>
-                <Body>
-                  <Text>Kode                  : {this.props.data.KODE}</Text>
-                  <Text>Nama                  : {this.props.data.NAMA}</Text>
-                  <Text>Merk                  : {this.props.data.MERK}</Text>
-                  <Text>Size                  : {this.props.data.SIZE}</Text>
-                  <Text>Quantity              : {this.props.data.JUMLAH}</Text>
-                  <Text note>Note             : {this.props.data.KETERANGAN}</Text>
-                </Body>
-              </Left>
-            </CardItem>
-          </Card>
-        </View>
+      <View>
+        <Card style={{ marginBottom: 15 }}>
+          <CardItem>
+            <Left>
+              <Body>
+                <Text>APD Name              : {this.props.data.NAMA}</Text>
+                <Text>Merk                  : {this.props.data.MERK}</Text>
+                <Text>Size                  : {this.props.data.SIZE}</Text>
+                <Text>Quantity              : {this.props.data.JUMLAH}</Text>
+                <Text note>Note             : {this.props.data.KETERANGAN}</Text>
+              </Body>
+            </Left>
+          </CardItem>
+        </Card>
+      </View>
     )
   }
 }
@@ -60,14 +62,18 @@ export default class ActionsPersonal extends Component {
 
   componentDidMount() {
     AsyncStorage.getItem('id').then((value) => {
+      this.setState({ 'id': value });
       this.loadData(value);
+    })
+    AsyncStorage.getItem('token').then((value) => {
+      this.setState({ 'token': value });
     })
   }
 
   loadData(id) {
     AsyncStorage.getItem('token').then((value) => {
       // alert(JSON.stringify(id));
-      const url = 'http://10.15.5.150/dev/she/api/v1/apd/approve/detail/request/' + id;
+      const url = GlobalConfig.SERVERHOST + 'api/v1/apd/approve/detail/request/' + id;
       var formData = new FormData();
       formData.append("token", value)
 
@@ -92,70 +98,138 @@ export default class ActionsPersonal extends Component {
     })
   }
 
+  rejectPersonal() {
+    // alert(JSON.stringify(this.state.id))
+    const url = GlobalConfig.SERVERHOST + 'api/v1/apd/approve/reject/order/RID-' + this.state.id;
+    // alert(this.state.token);
+    var formData = new FormData();
+    formData.append("token", this.state.token)
+    formData.append("note", this.state.note)
+
+    fetch(url, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      method: 'POST',
+      body: formData
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        // alert(JSON.stringify(responseJson));
+        if (responseJson.status == 200) {
+          Alert.alert('Success', 'Reject Success', [{
+            text: 'Okay'
+          }])
+          this.props.navigation.navigate('Main')
+        } else {
+          Alert.alert('Error', 'Reject Failed', [{
+            text: 'Okay'
+          }])
+        }
+      })
+  }
+
+  approvePersonal() {
+    // alert(JSON.stringify(value));
+    const url = GlobalConfig.SERVERHOST + 'api/v1/apd/approve/order';
+    var formData = new FormData();
+    formData.append("orderid", this.state.id)
+    formData.append("token", this.state.token)
+    formData.append("apr", 1)
+
+    fetch(url, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      method: 'POST',
+      body: formData
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        // alert(JSON.stringify(responseJson));
+        if (responseJson.status == 200) {
+          Alert.alert('Success', 'Approve Success', [{
+            text: 'Okay'
+          }])
+          this.props.navigation.navigate('Main')
+        } else {
+          Alert.alert('Error', 'Approve Failed', [{
+            text: 'Okay'
+          }])
+        }
+      })
+  }
+
   render() {
-    that=this;
+    that = this;
     return (
       this.state.isloading
-      ?
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size= "large" color= "#330066" animating />
-      </View>
-      :
-      <Container>
-        <View style={styles.container}>
-          <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-            <ImageBackground style={styles.backgroundImage}>
-              <ScrollView>
-                <View style={styles.content}>
-                  <View style={styles.inputContainer}>
-                    <Image source={require('../../images/icon-edit.png')} style={styles.headerImage}></Image>
-
-                    <Text style={styles.logo}>List Detail Request APD (Personal)</Text>
-                    <Text style={styles.logoChild}>PT Semen Indonesia</Text>
-
-                    <Content>
-                      <FlatList
-                        data={this.state.dataSource}
-                        renderItem={this._renderItem}
-                        keyExtractor={(item, index) => index.toString()}
-                      />
-                    </Content>
-
-                    <Text>Reject Note:</Text>
-                     <Form>
-                      <Textarea style={{marginBottom: 15}} rowSpan={5} bordered placeholder="Place note here .." />
-                      </Form>
-                  </View>
-
-                  <View style={styles.Contentsave}>
-                    <Button block style={{
-                    marginTop: 20,
-                    height: 45,
-                    borderWidth: 1,
-                    backgroundColor: '#1c84c6',
-                    borderColor: '#1c84c6',
-                    borderRadius: 4
-                  }}>
-                      <Text style={styles.buttonText}>Approve</Text>
-                    </Button>
-                    <Button block style={{
-                    marginTop: 15,
-                    height: 45,
-                    borderWidth: 1,
-                    backgroundColor: '#ed5565',
-                    borderColor: '#ed5565',
-                    borderRadius: 4
-                  }}>
-                      <Text style={styles.buttonText}>Reject</Text>
-                    </Button>
-                  </View>
-
-                  </View>
-              </ScrollView>
-            </ImageBackground>
-          </KeyboardAvoidingView>
+        ?
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#330066" animating />
         </View>
-      </Container>
+        :
+        <Container>
+          <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+              <ImageBackground style={styles.backgroundImage}>
+                <ScrollView>
+                  <View style={styles.content}>
+                    <View style={styles.inputContainer}>
+                      <Image source={require('../../images/icon-edit.png')} style={styles.headerImage}></Image>
+
+                      <Text style={styles.logo}>List Detail Request APD (Personal)</Text>
+                      <Text style={styles.logoChild}>PT Semen Indonesia</Text>
+
+                      <Content>
+                        <FlatList
+                          data={this.state.dataSource}
+                          renderItem={this._renderItem}
+                          keyExtractor={(item, index) => index.toString()}
+                        />
+                      </Content>
+
+                      <Text>Reject Note:</Text>
+                      <Form>
+                        <Textarea
+                          style={{ marginBottom: 15 }}
+                          rowSpan={5}
+                          bordered placeholder="Place note here .."
+                          onChangeText={(text) => this.setState({ note: text })} />
+                      </Form>
+                    </View>
+
+                    <View style={styles.Contentsave}>
+                      <Button block style={{
+                        marginTop: 20,
+                        height: 45,
+                        borderWidth: 1,
+                        backgroundColor: '#1c84c6',
+                        borderColor: '#1c84c6',
+                        borderRadius: 4
+                      }}
+                        onPress={() => that.approvePersonal()}>
+                        <Text style={styles.buttonText}>Approve</Text>
+                      </Button>
+                      <Button block style={{
+                        marginTop: 15,
+                        height: 45,
+                        borderWidth: 1,
+                        backgroundColor: '#ed5565',
+                        borderColor: '#ed5565',
+                        borderRadius: 4
+                      }}
+                        onPress={() => that.rejectPersonal()}>
+                        <Text style={styles.buttonText}>Reject</Text>
+                      </Button>
+                    </View>
+
+                  </View>
+                </ScrollView>
+              </ImageBackground>
+            </KeyboardAvoidingView>
+          </View>
+        </Container>
     );
   }
 }

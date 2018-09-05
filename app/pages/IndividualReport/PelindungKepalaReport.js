@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Header, Content, Card, CardItem, Text, Body } from 'native-base';
+import GlobalConfig from '../GlobalConfig';
+
 export default class PelindungKepalaReport extends Component {
   render() {
     return (
