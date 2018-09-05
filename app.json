@@ -1,4 +1,11 @@
 {
+<<<<<<< HEAD
   "name": "SHE",
   "displayName": "SHE"
 }
+=======
+  "expo": {
+    "sdkVersion": "27.0.0"
+  }
+}
+>>>>>>> 7494bddcc91f096d60c7a0792f2e9c0a483b48c7
